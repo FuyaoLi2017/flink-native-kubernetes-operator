@@ -1,0 +1,31 @@
+apiVersion: flink.k8s.io/v1alpha1
+kind: FlinkApplication
+metadata:
+  namespace: default
+  name: ipv4-address-test
+spec:
+  imageName: us-phoenix-1.ocir.io/idxglh0bz964/flink-demo:ipv4-address
+  imagePullSecrets:
+  - ocirsecret
+  jarURI: local:///opt/flink/usrlib/quickstart-0.1.jar
+  parallelism: 1
+  jobManagerResource:
+    mem: 4096m
+    cpu: 1
+  taskManagerResource:
+    mem: 2048m
+    cpu: 1
+  savepointsDir: s3://flink-object-store-poc-home-region/savepoints/
+#  savepointsDir: file:///tmp/savepoints
+  savepointGeneration: 0
+  flinkConfig:
+    taskmanager.numberOfTaskSlots: 2
+    kubernetes.jobmanager.service-account: flink-native-k8s-operator
+    kubernetes.container-start-command-template: "%java% %classpath% %jvmmem% %jvmopts% %logging% %class% %args%"
+    s3.access-key: ##
+    s3.secret-key: ##
+    s3.path-style-access: true
+    s3.endpoint: ##
+    state.backend: filesystem
+    state.checkpoints.dir: s3://flink-object-store-poc-home-region/checkpoints/
+    state.savepoints.dir: s3://flink-object-store-poc-home-region/savepoints/
